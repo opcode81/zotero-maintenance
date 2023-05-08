@@ -12,6 +12,8 @@ if __name__ == '__main__':
         description='Supports maintenance operations on the Zotero local storage')
     parser.add_option("--delete-library-storage", dest="delete_library_id",
         help="delete files from local storage that are associated with library ID", metavar="ID")
+    parser.add_option("--list-libraries", dest="list_libraries", action="store_true",
+        help="lists libraries with their identifiers", metavar="ID")
 
     (options, args) = parser.parse_args()
 
@@ -24,7 +26,11 @@ if __name__ == '__main__':
 
     con = sqlite3.connect(db_path)
 
-    if options.delete_library_id:
+    if options.list_libraries:
+        res = con.execute(f"SELECT libraryID, name from groups order by libraryID asc")
+        for item in res.fetchall():
+            print(f"ID=%s  %s" % item)
+    elif options.delete_library_id:
         library_id = options.delete_library_id
         print(f"Deleting library id {library_id} ...")
         res = con.execute(f"SELECT key FROM items WHERE libraryID={library_id}")
